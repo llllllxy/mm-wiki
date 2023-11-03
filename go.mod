@@ -4,6 +4,7 @@ go 1.12
 
 require (
 	github.com/StackExchange/wmi v1.2.1 // indirect
+	github.com/google/uuid v1.3.0 // indirect
 	github.com/asaskevich/govalidator v0.0.0-20190424111038-f61b66f89f4a // indirect
 	github.com/astaxie/beego v1.12.0
 	github.com/fatih/color v1.7.0
