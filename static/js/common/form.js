@@ -21,7 +21,7 @@ var Form = {
      * @param inPopup
      * @returns {boolean}
      */
-    ajaxSubmit: function(element, inPopup) {
+    ajaxSubmit: function (element, inPopup) {
 
         if (inPopup) {
             Form.inPopup = true;
@@ -50,17 +50,16 @@ var Form = {
          * @param result
          */
         function response(result) {
-            //console.log(result)
             if (result.code == 0) {
                 failed(result.message, result.data);
             }
             if (result.code == 1) {
                 successBox(result.message, result.data);
             }
-            $("body,html").animate({scrollTop:0},300);
+            $("body,html").animate({scrollTop: 0}, 300);
             if (result.redirect.url) {
                 var sleepTime = result.redirect.sleep || 3000;
-                setTimeout(function() {
+                setTimeout(function () {
                     if (Form.inPopup) {
                         parent.location.href = result.redirect.url;
                     } else {
@@ -70,8 +69,23 @@ var Form = {
             }
         }
 
+        function beforeSubmit(formData, jqForm, options) {
+            // 对要提交的数据进行修改
+            for (var i = 0; i < formData.length; i++) {
+                if (formData[i].name == 'pwd'
+                    || formData[i].name == 'pwd_new'
+                    || formData[i].name == 'pwd_confirm'
+                    || formData[i].name == 'password') {
+                    var value = formData[i].value;
+                    formData[i].value = hex_sha256(value);
+                }
+            }
+            return true;  // 返回true表示继续提交表单，返回false表示取消提交
+        }
+
         var options = {
             dataType: 'json',
+            beforeSubmit: beforeSubmit,
             success: response
         };
 

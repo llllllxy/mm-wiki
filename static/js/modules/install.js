@@ -49,7 +49,6 @@ var Install = {
 						$("#install_success").removeClass("hidden");
 					}
 				}
-
 			},
 			error : function(response) {
 				console.log(response.message)
@@ -92,8 +91,20 @@ var Install = {
             }
         }
 
+		function beforeSubmit(formData, jqForm, options) {
+			// 对要提交的数据进行修改
+			for (var i = 0; i < formData.length; i++) {
+				if (formData[i].name == 'admin_pass') {
+					var value = formData[i].value;
+					formData[i].value = hex_sha256(value);
+				}
+			}
+			return true;  // 返回true表示继续提交表单，返回false表示取消提交
+		}
+
         var options = {
             dataType: 'json',
+			beforeSubmit: beforeSubmit,
             success: response
         };
 
