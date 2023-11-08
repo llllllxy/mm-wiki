@@ -225,24 +225,18 @@ func (d *Document) Insert(documentValue map[string]interface{}) (id string, err 
 	}
 
 	// 处理同级排序编号
-	//parentId := documentValue["parent_id"].(string)
+	parentId := documentValue["parent_id"].(string)
 	spaceId := documentValue["space_id"].(string)
 
-
 	id = utils.NewDocumentId().Create()
-
-
-	logs.Info("created docId: %s", id)
-
 	docId := id
 
-	//sequence, err := d.GetDocumentMaxSequence(parentId, spaceId)
-	//if err != nil {
-	//	sequence = 0
-	//}
-	//
-	//sequence += 1
-	//documentValue["sequence"] = strconv.Itoa(sequence)
+	sequence, err := d.GetDocumentMaxSequence(parentId, spaceId)
+	if err != nil {
+		sequence = 0
+	}
+	sequence += 1
+	documentValue["sequence"] = strconv.Itoa(sequence)
 
 	var rs *mysql.ResultSet
 	documentValue["document_id"] = docId
@@ -258,7 +252,6 @@ func (d *Document) Insert(documentValue map[string]interface{}) (id string, err 
 	}
 
 	logs.Info("insert rows: %s, docId: %s", rs.RowsAffected, id)
-
 
 	// create document page file
 	document := map[string]string{
@@ -310,7 +303,6 @@ func (d *Document) Update(documentId string, documentValue map[string]interface{
 	if err != nil {
 		return
 	}
-	//id = rs.LastInsertId
 
 	logs.Info("update rows: ", rs.RowsAffected)
 
@@ -621,7 +613,7 @@ func (d *Document) GetDocumentsByDocumentIds(documentIds []string) (documents []
 	rs, err = db.Query(db.AR().From(Table_Document_Name).Where(map[string]interface{}{
 		"document_id": documentIds,
 		"is_delete":   Document_Delete_False,
-	}))
+	}).OrderBy("sequence", "asc").OrderBy("create_time", "asc"))
 	if err != nil {
 		return
 	}

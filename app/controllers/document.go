@@ -124,7 +124,6 @@ func (this *DocumentController) Add() {
 	this.Data["parent_id"] = parentId
 	this.Data["space_id"] = spaceId
 	this.viewLayout("document/form", "default")
-
 }
 
 // save document

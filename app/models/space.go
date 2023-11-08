@@ -2,6 +2,7 @@ package models
 
 import (
 	"fmt"
+	"github.com/astaxie/beego/logs"
 	"github.com/phachon/mm-wiki/app/utils"
 	"github.com/snail007/go-activerecord/mysql"
 	"time"
@@ -155,6 +156,7 @@ func (s *Space) UpdateDBAndSpaceFileName(spaceId string, spaceValue map[string]i
 	db := G.DB()
 	tx, err := db.Begin(db.Config)
 	if err != nil {
+		logs.Error("UpdateDBAndSpaceFileName db.Begin err=%s", err.Error())
 		return
 	}
 	var rs *mysql.ResultSet
@@ -162,6 +164,7 @@ func (s *Space) UpdateDBAndSpaceFileName(spaceId string, spaceValue map[string]i
 	// get real old space name (v0.1.2 #53 bug)
 	defaultDocument, err := DocumentModel.GetDocumentByParentIdAndSpaceId("0", spaceId, Document_Type_Dir)
 	if err != nil {
+		logs.Error("UpdateDBAndSpaceFileName GetDocumentByParentIdAndSpaceId err=%s", err.Error())
 		return
 	}
 	if oldName != defaultDocument["name"] {
@@ -175,6 +178,7 @@ func (s *Space) UpdateDBAndSpaceFileName(spaceId string, spaceValue map[string]i
 		"is_delete": Space_Delete_False,
 	}), tx)
 	if err != nil {
+		logs.Error("UpdateDBAndSpaceFileName Update space err=%s", err.Error())
 		tx.Rollback()
 		return
 	}
@@ -187,16 +191,18 @@ func (s *Space) UpdateDBAndSpaceFileName(spaceId string, spaceValue map[string]i
 	// update space document name
 	_, err = db.ExecTx(db.AR().Update(Table_Document_Name, documentValue, map[string]interface{}{
 		"space_id":  spaceId,
-		"parent_id": 0,
+		"parent_id": "0",
 		"type":      Document_Type_Dir,
 	}), tx)
 	if err != nil {
+		logs.Error("UpdateDBAndSpaceFileName Update document err=%s", err.Error())
 		tx.Rollback()
 		return
 	}
 	// update space name
 	err = utils.Document.UpdateSpaceName(oldName, spaceValue["name"].(string))
 	if err != nil {
+		logs.Error("UpdateDBAndSpaceFileName UpdateSpaceName err=%s", err.Error())
 		tx.Rollback()
 		return
 	}
