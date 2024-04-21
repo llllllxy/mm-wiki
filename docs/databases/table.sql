@@ -145,7 +145,7 @@ CREATE TABLE `mw_collection` (
   `collection_id` int(10) NOT NULL AUTO_INCREMENT COMMENT '用户收藏关系 id',
   `user_id` int(10) NOT NULL DEFAULT '0' COMMENT '用户id',
   `type` tinyint(4) NOT NULL DEFAULT '1' COMMENT '收藏类型 1 文档 2 空间',
-  `resource_id` int(10) NOT NULL DEFAULT '0' COMMENT '收藏资源 id ',
+  `resource_id` varchar(50) NOT NULL DEFAULT '0' COMMENT '收藏资源 id ',
   `create_time` int(11) NOT NULL DEFAULT '0' COMMENT '创建时间',
   PRIMARY KEY (`collection_id`),
   KEY (`user_id`),
